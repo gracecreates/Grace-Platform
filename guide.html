@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guide Reader | G.R.A.C.E.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="statusMessage" class="status-message hidden"></div>
 
+  <div class="page-wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-wrap"><img src="logo.PNG" class="logo" alt="G.R.A.C.E. logo" /></div>
+        <div>
+          <h2 class="brand-title">G.R.A.C.E.</h2>
+          <div class="brand-sub">Guide Reader</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a data-page="home" href="index.html">Home</a>
+        <a data-page="dashboard" href="dashboard.html">Dashboard</a>
+        <a data-page="tools" href="tools.html">AI Tools</a>
+        <a data-page="journal" href="journal.html">Journal</a>
+        <a data-page="library" href="library.html">Library</a>
+        <a data-page="games" href="games.html">Growth Lab</a>
+        <a data-page="events" href="events.html">Events</a>
+        <a data-page="membership" href="membership.html">Membership</a>
+      </nav>
+
+      <div class="nav-tools"><button class="btn btn-ghost" id="themeToggle">Light Mode</button></div>
+    </header>
+
+    <div class="page-head">
+      <h1>Get Right And Conquer Everything</h1>
+      <p>A Guide to Balance, Growth, and Purpose</p>
+    </div>
+
+    <section class="reader-layout">
+      <aside class="reader-sidebar card">
+        <h3 style="margin-top:0;">Chapters</h3>
+        <div id="chapterList" class="chapter-list"></div>
+      </aside>
+
+      <main class="reader-main card">
+        <h2 id="readerTitle">Introduction</h2>
+        <div id="readerText" class="reader-text"></div>
+      </main>
+
+      <aside class="reader-actions card">
+        <h3 id="promptTitle" style="margin-top:0;">Reflection</h3>
+        <p class="small">Use the guide as a real tool, not just something to read once.</p>
+
+        <label class="field">
+          <span>Your note</span>
+          <textarea id="guideNote" class="textarea" placeholder="What stands out to you? What does this bring up?"></textarea>
+        </label>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="saveGuideNoteBtn">Save Reflection</button>
+          <button class="btn btn-secondary" id="addToJournalBtn">Add to Journal</button>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    initSharedUI("library");
+    renderGuideReader();
+  </script>
+</body>
+</html>
