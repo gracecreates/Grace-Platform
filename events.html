@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events | G.R.A.C.E.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-wrap"><img src="logo.PNG" class="logo" alt="G.R.A.C.E. logo" /></div>
+        <div><h2 class="brand-title">G.R.A.C.E.</h2><div class="brand-sub">Events & Workshops</div></div>
+      </div>
 
+      <nav class="nav">
+        <a data-page="home" href="index.html">Home</a>
+        <a data-page="dashboard" href="dashboard.html">Dashboard</a>
+        <a data-page="tools" href="tools.html">AI Tools</a>
+        <a data-page="journal" href="journal.html">Journal</a>
+        <a data-page="library" href="library.html">Library</a>
+        <a data-page="games" href="games.html">Growth Lab</a>
+        <a data-page="events" href="events.html">Events</a>
+        <a data-page="membership" href="membership.html">Membership</a>
+      </nav>
+
+      <div class="nav-tools"><button class="btn btn-ghost" id="themeToggle">Light Mode</button></div>
+    </header>
+
+    <div class="page-head">
+      <h1>Events & Workshops</h1>
+      <p>Upcoming G.R.A.C.E. experiences, workshops, wellness spaces, and future programming.</p>
+    </div>
+
+    <section class="section">
+      <div class="grid-3">
+        <div class="mini-card">
+          <h3>Upcoming soon</h3>
+          <p>Live events, guided workshops, and future G.R.A.C.E. experiences will appear here.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Workshop themes</h3>
+          <p>8 dimensions of wellness, rebuilding life structure, purpose, peer support, financial clarity, and growth planning.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Future calendar</h3>
+          <p>This page is designed to become a real event calendar with registration, reminders, and community access.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    initSharedUI("events");
+  </script>
+</body>
+</html>
