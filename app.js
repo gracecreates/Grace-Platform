@@ -260,7 +260,8 @@ function renderGuideReader() {
   paint();
 
   const saveBtn = document.getElementById("saveGuideNoteBtn");
-  if (saveBtn) {
+  if (saveBtn && !saveBtn.dataset.bound) {
+    saveBtn.dataset.bound = "true";
     saveBtn.addEventListener("click", () => {
       const noteInput = document.getElementById("guideNote");
       const note = noteInput?.value.trim() || "";
@@ -271,7 +272,7 @@ function renderGuideReader() {
         note,
         date: new Date().toISOString()
       });
-      state.guideNotes = state.guideNotes.slice(0, 50);
+      state.guideNotes = state.guideNotes.slice(-50);
       saveState();
 
       if (noteInput) noteInput.value = "";
@@ -280,7 +281,8 @@ function renderGuideReader() {
   }
 
   const addJournalBtn = document.getElementById("addToJournalBtn");
-  if (addJournalBtn) {
+  if (addJournalBtn && !addJournalBtn.dataset.bound) {
+    addJournalBtn.dataset.bound = "true";
     addJournalBtn.addEventListener("click", () => {
       const noteInput = document.getElementById("guideNote");
       const note = noteInput?.value.trim() || "";
@@ -292,7 +294,7 @@ function renderGuideReader() {
         text: note,
         date: new Date().toISOString()
       });
-      state.journal = state.journal.slice(0, 100);
+      state.journal = state.journal.slice(-100);
       saveState();
 
       if (noteInput) noteInput.value = "";
@@ -332,7 +334,7 @@ function renderJournal() {
         date: new Date().toISOString(),
         type: "journal"
       });
-      state.journal = state.journal.slice(0, 100);
+      state.journal = state.journal.slice(-100);
       saveState();
 
       if (titleInput) titleInput.value = "";
@@ -386,7 +388,7 @@ function initAICoach() {
       addBubble(msg.role, msg.content, false);
     });
   } else {
-    addBubble("assistant", "Alright. Talk to me. What is going on right now?");
+    addBubble("assistant", "Alright. Talk to me. What is going on right now?", false);
   }
 
   if (!sendBtn.dataset.bound) {
@@ -431,24 +433,20 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("saveProfileBtn").addEventListener("click", saveProfileFromForm);
   }
 
-  if (document.querySelector('.nav a[data-page="home"]') && document.title.includes("G.R.A.C.E.")) {
-    const activeLink = document.querySelector(".nav a.active");
-    if (!activeLink) {
-      const currentFile = window.location.pathname.split("/").pop() || "index.html";
-      const currentPageMap = {
-        "index.html": "home",
-        "dashboard.html": "dashboard",
-        "tools.html": "tools",
-        "journal.html": "journal",
-        "library.html": "library",
-        "games.html": "games",
-        "events.html": "events",
-        "membership.html": "membership",
-        "guide.html": "guide"
-      };
-      initSharedUI(currentPageMap[currentFile] || "home");
-    }
-  }
+  const currentFile = window.location.pathname.split("/").pop() || "index.html";
+  const currentPageMap = {
+    "index.html": "home",
+    "dashboard.html": "dashboard",
+    "tools.html": "tools",
+    "journal.html": "journal",
+    "library.html": "library",
+    "games.html": "games",
+    "events.html": "events",
+    "membership.html": "membership",
+    "guide.html": "library"
+  };
+
+  initSharedUI(currentPageMap[currentFile] || "home");
 
   if (document.getElementById("dimensionGrid")) renderDashboard();
   if (document.getElementById("toolSections")) renderTools();
