@@ -3,37 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Growth Lab | G.R.A.C.E.</title>
+  <title>Interactive Tools | G.R.A.C.E.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="statusMessage" class="status-message hidden"></div>
+
   <div class="page-wrap">
     <header class="topbar">
       <div class="brand">
-        <div class="logo-wrap"><img src="logo.PNG" class="logo" alt="G.R.A.C.E. logo" /></div>
-        <div><h2 class="brand-title">G.R.A.C.E.</h2><div class="brand-sub">Growth Lab</div></div>
+        <div class="logo-wrap">
+          <img src="logo.PNG" class="logo" alt="G.R.A.C.E. logo" />
+        </div>
+        <div>
+          <h2 class="brand-title">G.R.A.C.E.</h2>
+          <div class="brand-sub">Interactive Tools</div>
+        </div>
       </div>
 
       <nav class="nav">
         <a data-page="home" href="index.html">Home</a>
         <a data-page="dashboard" href="dashboard.html">Dashboard</a>
-        <a data-page="tools" href="tools.html">AI Tools</a>
+        <a data-page="tools" href="tools.html">G.R.A.C.E. Tools</a>
         <a data-page="journal" href="journal.html">Journal</a>
         <a data-page="library" href="library.html">Library</a>
-        <a data-page="games" href="games.html">Growth Lab</a>
+        <a data-page="games" href="games.html">Interactive Tools</a>
         <a data-page="events" href="events.html">Events</a>
         <a data-page="membership" href="membership.html">Membership</a>
       </nav>
-
-      <div class="nav-tools"><button class="btn btn-ghost" id="themeToggle">Light Mode</button></div>
     </header>
 
     <div class="page-head">
-      <h1>Growth Lab</h1>
-      <p>Interactive game experiences for rebuilding, resilience, peer support, and life strategy.</p>
+      <h1>Interactive Tools</h1>
+      <p>Explore interactive tools, games, and experiences connected to growth, support, and life direction.</p>
     </div>
 
     <section class="section">
@@ -47,7 +55,7 @@
         <div class="game-card">
           <div class="game-badge">NYC Resilience</div>
           <h3>NYC Resilience Board Game</h3>
-          <p>A board game artifact centered on wellness, peer support, resilience, and navigating life through New York energy.</p>
+          <p>A board game experience centered on wellness, peer support, resilience, and navigating life through New York energy.</p>
         </div>
 
         <div class="game-card">
@@ -58,7 +66,7 @@
 
         <div class="game-card">
           <div class="game-badge">Coming Soon</div>
-          <h3>Entrepreneur Simulator</h3>
+          <h3>Business Builder</h3>
           <p>Learn to balance wellness, risk, creativity, money, and decisions while building something meaningful.</p>
         </div>
 
@@ -69,9 +77,9 @@
         </div>
 
         <div class="game-card">
-          <div class="game-badge">Future AI</div>
-          <h3>AI Personal Board Game Creator</h3>
-          <p>Generate custom games based on goals, recovery, business, life strategy, and wellness dimensions.</p>
+          <div class="game-badge">Future Tool</div>
+          <h3>Board Game Builder</h3>
+          <p>Create custom games based on goals, wellness, recovery, life direction, and growth.</p>
         </div>
       </div>
     </section>
