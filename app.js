@@ -1,6 +1,58 @@
 const STORAGE_KEY = "grace-os-v1";
 const WORKER_URL = "https://grace-chat-worker.getrightandconquer.workers.dev";
 
+const GRACE_SYSTEM = `You are G.R.A.C.E. Get Right And Conquer Everything.
+
+You were built by someone who has lived through real things. Depression, anxiety, loss, financial setbacks, relationship struggles. Not as theory. As lived experience. That is why you exist.
+
+How you show up in every conversation:
+
+When someone is overwhelmed, you slow things down first. You do not jump into advice. You let them talk. You listen. Then you respond.
+You start simple. "Alright. Talk to me. What is going on right now?"
+After they get it out you acknowledge it. "Okay. I hear you." Then you offer something real, not a speech.
+You ground people. "Right now we are just talking. You are not alone in this moment."
+You help them break things into smaller pieces. "We do not have to solve everything tonight. Let us focus on what is happening right now."
+You remind people that what they are feeling is not permanent.
+You ask targeted questions to understand what is really going on.
+You never leave a conversation on a heavy or unresolved note.
+You never give motivational speeches. You give presence, honesty, and help people get through the moment.
+
+Your tone always:
+Direct. Warm but honest. No sugarcoating. No fluff. No fake positivity.
+Short sentences. Real words. Nothing performative.
+You remind people who they are when they forget.
+You keep things grounded and actionable.
+You meet people where they are.
+You always end with one clear next step or something that gives them a little strength to keep going.`;
+
+const CHAT_SYSTEM_RESPONSES = [
+  {
+    match: ["stuck", "direction", "lost", "confused"],
+    reply:
+      "Okay. I hear you.\n\nWhen everything feels stuck, the first move is not to solve your whole life tonight. It is to get more honest about what feels most off.\n\nStart with this: what feels heaviest right now — money, emotions, structure, work, or relationships?\n\nNext step: pick one area and answer that in one sentence."
+  },
+  {
+    match: ["overwhelmed", "burnout", "stress", "too much"],
+    reply:
+      "Okay. I hear you.\n\nWhen you are overwhelmed, the goal is not to push harder. It is to slow things down enough to see what is actually going on.\n\nRight now, name the 3 things taking up the most energy.\n\nNext step: write those 3 things down, then circle the one that cannot wait."
+  },
+  {
+    match: ["decision", "decide", "choice"],
+    reply:
+      "Alright. Let us slow it down.\n\nMost hard decisions feel impossible when everything is mixed together. Usually there is the practical side, the emotional side, and the fear side.\n\nWhat decision are you trying to make, and what are the top 2 options?\n\nNext step: tell me the options first, not the whole story."
+  },
+  {
+    match: ["money", "rent", "debt", "financial"],
+    reply:
+      "Okay. Money stress can make everything feel louder.\n\nDo not judge the situation right now. Just get clear on it. What matters most first is what is urgent, what is due, and what can wait.\n\nNext step: list your top 3 money pressures in order."
+  },
+  {
+    match: ["anxiety", "depressed", "sad", "mental", "emotion"],
+    reply:
+      "Okay. I hear you.\n\nYou do not need to act like you are fine right now. Let us keep it simple.\n\nWhat feels strongest today — anxiety, sadness, numbness, anger, or exhaustion?\n\nNext step: name which one is leading today."
+  }
+];
+
 function defaultState() {
   return {
     profile: {
@@ -345,23 +397,49 @@ function renderJournal() {
   }
 }
 
-async function askGrace(messages) {
+function generateGraceReply(text) {
+  const lower = text.toLowerCase();
+
+  for (const item of CHAT_SYSTEM_RESPONSES) {
+    if (item.match.some((keyword) => lower.includes(keyword))) {
+      return item.reply;
+    }
+  }
+
+  return "Okay. I hear you.\n\nYou do not need to solve everything right now. Let us slow it down and get clearer.\n\nWhat feels most pressing at this moment — your emotions, your money, your routines, your work, or your relationships?\n\nNext step: answer with just one of those.";
+}
+
+function buildWorkerMessages() {
+  return state.coachChat.map((msg) => ({
+    role: msg.role,
+    content: msg.text
+  }));
+}
+
+async function askGraceViaWorker() {
   const response = await fetch(WORKER_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
-      system: `You are G.R.A.C.E. — a direct, supportive, peer-style guide. Keep things grounded, warm, clear, and actionable. Do not act like therapy, crisis care, or medical advice. Help people slow things down, sort through what matters, and focus on one doable next move.`,
-      messages
+      system: GRACE_SYSTEM,
+      messages: buildWorkerMessages()
     })
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(text || "Worker request failed");
+    throw new Error(`Worker error ${response.status}: ${text}`);
   }
 
   const data = await response.json();
-  return data.reply || "Let’s slow it down and start with one thing that matters most right now.";
+
+  if (!data || !data.reply) {
+    throw new Error("Worker returned no reply");
+  }
+
+  return data.reply;
 }
 
 function initAICoach() {
@@ -370,20 +448,30 @@ function initAICoach() {
   const messagesWrap = document.getElementById("coachMessages");
   if (!sendBtn || !input || !messagesWrap) return;
 
-  state.coachChat = [];
-  saveState();
-
-  function addBubble(role, text) {
+  function addBubble(role, text, saveToState = true) {
     const div = document.createElement("div");
     div.className = "mini-card";
     div.style.marginBottom = "12px";
-    div.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0;">${escapeHtml(text)}</p>`;
+    div.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0; white-space:pre-wrap;">${escapeHtml(text)}</p>`;
     messagesWrap.appendChild(div);
     messagesWrap.scrollTop = messagesWrap.scrollHeight;
+
+    if (saveToState) {
+      state.coachChat.push({ role, text });
+      state.coachChat = state.coachChat.slice(-20);
+      saveState();
+    }
   }
 
   messagesWrap.innerHTML = "";
-  addBubble("assistant", "Alright. Talk to me. What is going on right now?");
+
+  if (state.coachChat.length) {
+    state.coachChat.forEach((msg) => {
+      addBubble(msg.role, msg.text, false);
+    });
+  } else {
+    addBubble("assistant", "Alright. Talk to me. What is going on right now?", false);
+  }
 
   if (!sendBtn.dataset.bound) {
     sendBtn.dataset.bound = "true";
@@ -392,22 +480,19 @@ function initAICoach() {
       const text = input.value.trim();
       if (!text) return;
 
-      state.coachChat.push({ role: "user", content: text });
-      saveState();
-
       addBubble("user", text);
       input.value = "";
       sendBtn.disabled = true;
       sendBtn.textContent = "Thinking...";
 
       try {
-        const reply = await askGrace(state.coachChat);
-        state.coachChat.push({ role: "assistant", content: reply });
-        saveState();
+        const reply = await askGraceViaWorker();
         addBubble("assistant", reply);
       } catch (error) {
-        console.error(error);
-        addBubble("assistant", "Something went wrong. Try again.");
+        console.error("Worker failed, using fallback reply:", error);
+        const fallbackReply = generateGraceReply(text);
+        addBubble("assistant", fallbackReply);
+        showStatus("Cloud chat is not connected yet. Using local backup reply.");
       } finally {
         sendBtn.disabled = false;
         sendBtn.textContent = "Send";
@@ -417,7 +502,6 @@ function initAICoach() {
 
   if (!input.dataset.bound) {
     input.dataset.bound = "true";
-
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
