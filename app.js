@@ -3,7 +3,6 @@ const WORKER_URL = "https://grace-chat-worker.getrightandconquer.workers.dev";
 
 function defaultState() {
   return {
-    theme: "dark",
     profile: {
       name: "",
       goal: "",
@@ -21,7 +20,8 @@ function defaultState() {
     },
     journal: [],
     guideNotes: [],
-    history: []
+    history: [],
+    coachChat: []
   };
 }
 
@@ -37,7 +37,8 @@ function loadState() {
       scores: { ...defaultState().scores, ...(parsed.scores || {}) },
       journal: Array.isArray(parsed.journal) ? parsed.journal : [],
       guideNotes: Array.isArray(parsed.guideNotes) ? parsed.guideNotes : [],
-      history: Array.isArray(parsed.history) ? parsed.history : []
+      history: Array.isArray(parsed.history) ? parsed.history : [],
+      coachChat: Array.isArray(parsed.coachChat) ? parsed.coachChat : []
     };
   } catch {
     return defaultState();
@@ -81,34 +82,24 @@ function showStatus(message) {
   showStatus._timer = setTimeout(() => el.classList.add("hidden"), 2500);
 }
 
-function applyTheme() {
-  document.body.classList.toggle("light-mode", state.theme === "light");
-  const btn = document.getElementById("themeToggle");
-  if (btn) btn.textContent = state.theme === "light" ? "Dark Mode" : "Light Mode";
-}
-
-function toggleTheme() {
-  state.theme = state.theme === "dark" ? "light" : "dark";
-  saveState();
-  applyTheme();
-}
-
 function initSharedUI(activePage) {
   const nav = document.querySelectorAll(".nav a");
   nav.forEach((link) => {
-    if (link.dataset.page === activePage) link.classList.add("active");
+    if (link.dataset.page === activePage) {
+      link.classList.add("active");
+    }
   });
-
-  const themeBtn = document.getElementById("themeToggle");
-  if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
-
-  applyTheme();
 }
 
 function saveProfileFromForm() {
   const name = document.getElementById("profileName")?.value.trim() || "";
   const goal = document.getElementById("profileGoal")?.value.trim() || "";
   const block = document.getElementById("profileBlock")?.value.trim() || "";
+
+  if (!name && !goal && !block) {
+    showStatus("Add at least one detail before saving.");
+    return;
+  }
 
   state.profile = { name, goal, block };
   saveState();
@@ -184,7 +175,7 @@ function renderTools() {
       <div class="tag-row">
         ${section.items.map((item) => `<span class="tag">${escapeHtml(item)}</span>`).join("")}
       </div>
-      <p class="small" style="margin-top:14px;">Built for future AI-powered workflows inside the G.R.A.C.E. life operating system.</p>
+      <p class="small" style="margin-top:14px;">Built for future support tools, guided reflection, planning help, and growth inside G.R.A.C.E.</p>
     </div>
   `).join("");
 }
@@ -271,7 +262,8 @@ function renderGuideReader() {
   const saveBtn = document.getElementById("saveGuideNoteBtn");
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
-      const note = document.getElementById("guideNote").value.trim();
+      const noteInput = document.getElementById("guideNote");
+      const note = noteInput?.value.trim() || "";
       if (!note) return;
 
       state.guideNotes.unshift({
@@ -281,7 +273,8 @@ function renderGuideReader() {
       });
       state.guideNotes = state.guideNotes.slice(0, 50);
       saveState();
-      document.getElementById("guideNote").value = "";
+
+      if (noteInput) noteInput.value = "";
       showStatus("Reflection saved.");
     });
   }
@@ -289,7 +282,8 @@ function renderGuideReader() {
   const addJournalBtn = document.getElementById("addToJournalBtn");
   if (addJournalBtn) {
     addJournalBtn.addEventListener("click", () => {
-      const note = document.getElementById("guideNote").value.trim();
+      const noteInput = document.getElementById("guideNote");
+      const note = noteInput?.value.trim() || "";
       if (!note) return;
 
       state.journal.unshift({
@@ -300,7 +294,8 @@ function renderGuideReader() {
       });
       state.journal = state.journal.slice(0, 100);
       saveState();
-      document.getElementById("guideNote").value = "";
+
+      if (noteInput) noteInput.value = "";
       showStatus("Added to journal.");
     });
   }
@@ -321,10 +316,13 @@ function renderJournal() {
     : `<div class="mini-card"><h3>No entries yet</h3><p>Start with a daily reflection, weekly reset, or guide note.</p></div>`;
 
   const saveBtn = document.getElementById("saveJournalBtn");
-  if (saveBtn) {
+  if (saveBtn && !saveBtn.dataset.bound) {
+    saveBtn.dataset.bound = "true";
     saveBtn.addEventListener("click", () => {
-      const title = document.getElementById("journalTitle").value.trim() || "Journal Entry";
-      const text = document.getElementById("journalText").value.trim();
+      const titleInput = document.getElementById("journalTitle");
+      const textInput = document.getElementById("journalText");
+      const title = titleInput?.value.trim() || "Journal Entry";
+      const text = textInput?.value.trim() || "";
 
       if (!text) return;
 
@@ -337,8 +335,8 @@ function renderJournal() {
       state.journal = state.journal.slice(0, 100);
       saveState();
 
-      document.getElementById("journalTitle").value = "";
-      document.getElementById("journalText").value = "";
+      if (titleInput) titleInput.value = "";
+      if (textInput) textInput.value = "";
       renderJournal();
       showStatus("Journal entry saved.");
     });
@@ -350,7 +348,7 @@ async function askGrace(messages) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      system: `You are G.R.A.C.E. — a direct, supportive, peer-style AI coach inside a life operating system. Keep things grounded, warm, honest, and actionable. Never act like therapy. End with one clear next step.`,
+      system: `You are G.R.A.C.E. — a direct, supportive, peer-style guide. Keep things grounded, warm, clear, and actionable. Do not act like therapy, crisis care, or medical advice. Help people slow things down, sort through what matters, and focus on one doable next move.`,
       messages
     })
   });
@@ -366,39 +364,97 @@ function initAICoach() {
   const messagesWrap = document.getElementById("coachMessages");
   if (!sendBtn || !input || !messagesWrap) return;
 
-  const chat = [];
-
-  function addBubble(role, text) {
+  function addBubble(role, text, save = true) {
     const div = document.createElement("div");
-    div.className = `mini-card`;
+    div.className = "mini-card";
     div.style.marginBottom = "12px";
     div.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0;">${escapeHtml(text)}</p>`;
     messagesWrap.appendChild(div);
     messagesWrap.scrollTop = messagesWrap.scrollHeight;
+
+    if (save) {
+      state.coachChat.push({ role, content: text });
+      state.coachChat = state.coachChat.slice(-30);
+      saveState();
+    }
   }
 
-  addBubble("assistant", "Alright. Talk to me. What is going on right now?");
+  messagesWrap.innerHTML = "";
 
-  sendBtn.addEventListener("click", async () => {
-    const text = input.value.trim();
-    if (!text) return;
+  if (state.coachChat.length) {
+    state.coachChat.forEach((msg) => {
+      addBubble(msg.role, msg.content, false);
+    });
+  } else {
+    addBubble("assistant", "Alright. Talk to me. What is going on right now?");
+  }
 
-    chat.push({ role: "user", content: text });
-    addBubble("user", text);
-    input.value = "";
-    sendBtn.disabled = true;
-    sendBtn.textContent = "Thinking...";
+  if (!sendBtn.dataset.bound) {
+    sendBtn.dataset.bound = "true";
 
-    try {
-      const reply = await askGrace(chat);
-      chat.push({ role: "assistant", content: reply });
-      addBubble("assistant", reply);
-    } catch {
-      const fallback = "Okay. I hear you. You do not need to solve everything right now. Name the one area that feels heaviest: emotions, money, routines, work, or relationships.";
-      addBubble("assistant", fallback);
-    } finally {
-      sendBtn.disabled = false;
-      sendBtn.textContent = "Send";
-    }
-  });
+    sendBtn.addEventListener("click", async () => {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addBubble("user", text);
+      input.value = "";
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Thinking...";
+
+      try {
+        const reply = await askGrace(state.coachChat);
+        addBubble("assistant", reply);
+      } catch {
+        const fallback = "Okay. I hear you. You do not need to figure everything out right now. Let’s slow it down. What feels heaviest at this moment: emotions, money, routines, work, or relationships?";
+        addBubble("assistant", fallback);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
+      }
+    });
+  }
+
+  if (!input.dataset.bound) {
+    input.dataset.bound = "true";
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendBtn.click();
+      }
+    });
+  }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("saveProfileBtn")) {
+    document.getElementById("saveProfileBtn").addEventListener("click", saveProfileFromForm);
+  }
+
+  if (document.querySelector('.nav a[data-page="home"]') && document.title.includes("G.R.A.C.E.")) {
+    const activeLink = document.querySelector(".nav a.active");
+    if (!activeLink) {
+      const currentFile = window.location.pathname.split("/").pop() || "index.html";
+      const currentPageMap = {
+        "index.html": "home",
+        "dashboard.html": "dashboard",
+        "tools.html": "tools",
+        "journal.html": "journal",
+        "library.html": "library",
+        "games.html": "games",
+        "events.html": "events",
+        "membership.html": "membership",
+        "guide.html": "guide"
+      };
+      initSharedUI(currentPageMap[currentFile] || "home");
+    }
+  }
+
+  if (document.getElementById("dimensionGrid")) renderDashboard();
+  if (document.getElementById("toolSections")) renderTools();
+  if (document.getElementById("membershipGrid")) renderMemberships();
+  if (document.getElementById("libraryGrid")) renderLibrary();
+  if (document.getElementById("chapterList")) renderGuideReader();
+  if (document.getElementById("journalEntries")) renderJournal();
+  if (document.getElementById("coachMessages")) initAICoach();
+});
