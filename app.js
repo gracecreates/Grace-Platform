@@ -73,7 +73,7 @@ function defaultState() {
     journal: [],
     guideNotes: [],
     history: [],
-    coachChat: []
+    chatHistory: []
   };
 }
 
@@ -90,7 +90,7 @@ function loadState() {
       journal: Array.isArray(parsed.journal) ? parsed.journal : [],
       guideNotes: Array.isArray(parsed.guideNotes) ? parsed.guideNotes : [],
       history: Array.isArray(parsed.history) ? parsed.history : [],
-      coachChat: Array.isArray(parsed.coachChat) ? parsed.coachChat : []
+      chatHistory: Array.isArray(parsed.chatHistory) ? parsed.chatHistory : []
     };
   } catch {
     return defaultState();
@@ -409,11 +409,47 @@ function generateGraceReply(text) {
   return "Okay. I hear you.\n\nYou do not need to solve everything right now. Let us slow it down and get clearer.\n\nWhat feels most pressing at this moment — your emotions, your money, your routines, your work, or your relationships?\n\nNext step: answer with just one of those.";
 }
 
+function addChatMessage(role, text, saveToState = true) {
+  const wrap = document.getElementById("chatMessages");
+  if (!wrap) return;
+
+  const bubble = document.createElement("div");
+  bubble.className = "mini-card";
+  bubble.style.marginBottom = "12px";
+  bubble.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0; white-space:pre-wrap;">${escapeHtml(text)}</p>`;
+  wrap.appendChild(bubble);
+  wrap.scrollTop = wrap.scrollHeight;
+
+  if (saveToState) {
+    state.chatHistory.push({ role, text });
+    state.chatHistory = state.chatHistory.slice(-20);
+    saveState();
+  }
+}
+
+function restoreChatHistory() {
+  const wrap = document.getElementById("chatMessages");
+  if (!wrap) return;
+
+  wrap.innerHTML = "";
+
+  if (!state.chatHistory.length) {
+    addChatMessage("assistant", "Alright. Talk to me. What is going on right now?", false);
+    return;
+  }
+
+  state.chatHistory.forEach((msg) => {
+    addChatMessage(msg.role, msg.text, false);
+  });
+}
+
 function buildWorkerMessages() {
-  return state.coachChat.map((msg) => ({
-    role: msg.role,
-    content: msg.text
-  }));
+  return state.chatHistory
+    .filter((msg) => msg.role === "user" || msg.role === "assistant")
+    .map((msg) => ({
+      role: msg.role,
+      content: msg.text
+    }));
 }
 
 async function askGraceViaWorker() {
@@ -442,62 +478,42 @@ async function askGraceViaWorker() {
   return data.reply;
 }
 
-function initAICoach() {
-  const sendBtn = document.getElementById("sendCoachBtn");
-  const input = document.getElementById("coachInput");
-  const messagesWrap = document.getElementById("coachMessages");
+async function sendGraceMessage(prefillText = null) {
+  const input = document.getElementById("chatInput");
+  const btn = document.getElementById("sendChatBtn");
+  const text = (prefillText ?? input.value).trim();
+  if (!text || !btn) return;
+
+  addChatMessage("user", text);
+  if (input) input.value = "";
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  try {
+    const reply = await askGraceViaWorker();
+    addChatMessage("assistant", reply);
+  } catch (error) {
+    console.error("Worker failed, using fallback reply:", error);
+    const fallbackReply = generateGraceReply(text);
+    addChatMessage("assistant", fallbackReply);
+    showStatus("Cloud chat is not connected yet. Using local backup reply.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send";
+  }
+}
+
+function initToolsChat() {
+  const sendBtn = document.getElementById("sendChatBtn");
+  const input = document.getElementById("chatInput");
+  const messagesWrap = document.getElementById("chatMessages");
   if (!sendBtn || !input || !messagesWrap) return;
 
-  function addBubble(role, text, saveToState = true) {
-    const div = document.createElement("div");
-    div.className = "mini-card";
-    div.style.marginBottom = "12px";
-    div.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0; white-space:pre-wrap;">${escapeHtml(text)}</p>`;
-    messagesWrap.appendChild(div);
-    messagesWrap.scrollTop = messagesWrap.scrollHeight;
-
-    if (saveToState) {
-      state.coachChat.push({ role, text });
-      state.coachChat = state.coachChat.slice(-20);
-      saveState();
-    }
-  }
-
-  messagesWrap.innerHTML = "";
-
-  if (state.coachChat.length) {
-    state.coachChat.forEach((msg) => {
-      addBubble(msg.role, msg.text, false);
-    });
-  } else {
-    addBubble("assistant", "Alright. Talk to me. What is going on right now?", false);
-  }
+  restoreChatHistory();
 
   if (!sendBtn.dataset.bound) {
     sendBtn.dataset.bound = "true";
-
-    sendBtn.addEventListener("click", async () => {
-      const text = input.value.trim();
-      if (!text) return;
-
-      addBubble("user", text);
-      input.value = "";
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Thinking...";
-
-      try {
-        const reply = await askGraceViaWorker();
-        addBubble("assistant", reply);
-      } catch (error) {
-        console.error("Worker failed, using fallback reply:", error);
-        const fallbackReply = generateGraceReply(text);
-        addBubble("assistant", fallbackReply);
-        showStatus("Cloud chat is not connected yet. Using local backup reply.");
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Send";
-      }
-    });
+    sendBtn.addEventListener("click", () => sendGraceMessage());
   }
 
   if (!input.dataset.bound) {
@@ -505,7 +521,7 @@ function initAICoach() {
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        sendBtn.click();
+        sendGraceMessage();
       }
     });
   }
@@ -537,5 +553,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("libraryGrid")) renderLibrary();
   if (document.getElementById("chapterList")) renderGuideReader();
   if (document.getElementById("journalEntries")) renderJournal();
-  if (document.getElementById("coachMessages")) initAICoach();
+  if (document.getElementById("chatMessages")) initToolsChat();
 });
