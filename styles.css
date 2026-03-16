@@ -39,21 +39,6 @@ body {
   min-height: 100vh;
 }
 
-body.light-mode {
-  --bg: #f5f0fb;
-  --bg-soft: #ffffff;
-  --panel: rgba(255,255,255,0.88);
-  --panel-2: rgba(248,244,252,0.96);
-  --line: #ddd0ee;
-  --line-soft: rgba(54, 38, 75, 0.08);
-  --text: #241733;
-  --muted: #655579;
-  --muted-2: #7d6f90;
-  background:
-    radial-gradient(circle at top, rgba(195, 164, 235, 0.22) 0%, rgba(245, 240, 251, 0.98) 30%),
-    linear-gradient(180deg, #f8f5fb 0%, #f2ecfa 100%);
-}
-
 a {
   color: inherit;
   text-decoration: none;
@@ -105,10 +90,6 @@ select:focus-visible {
   background: rgba(15, 10, 23, 0.75);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow);
-}
-
-body.light-mode .topbar {
-  background: rgba(255,255,255,0.8);
 }
 
 .brand {
@@ -167,11 +148,6 @@ body.light-mode .topbar {
   color: #fff;
 }
 
-body.light-mode .nav a:hover,
-body.light-mode .nav a.active {
-  color: #241733;
-}
-
 .nav-tools {
   display: flex;
   gap: 10px;
@@ -189,12 +165,6 @@ body.light-mode .nav a.active {
   backdrop-filter: blur(12px);
 }
 
-body.light-mode .card,
-body.light-mode .panel,
-body.light-mode .glass {
-  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(247,242,252,0.98));
-}
-
 .hero {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
@@ -206,8 +176,8 @@ body.light-mode .glass {
 .page-head h1 {
   margin: 0 0 16px;
   font-family: "Cormorant Garamond", serif;
-  font-size: 62px;
-  line-height: 0.96;
+  font-size: 54px;
+  line-height: 0.98;
   letter-spacing: -0.02em;
 }
 
@@ -230,9 +200,9 @@ body.light-mode .glass {
   color: #f8d8e8;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .grid-2,
@@ -271,21 +241,11 @@ body.light-mode .glass {
 .membership-card,
 .reader-card,
 .game-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 22px;
   height: 100%;
-}
-
-body.light-mode .mini-card,
-body.light-mode .feature-card,
-body.light-mode .tool-card,
-body.light-mode .dimension-card,
-body.light-mode .membership-card,
-body.light-mode .reader-card,
-body.light-mode .game-card {
-  background: rgba(255,255,255,0.6);
 }
 
 .mini-card h3,
@@ -331,19 +291,10 @@ body.light-mode .game-card {
   border: 1px solid var(--line);
 }
 
-body.light-mode .btn-secondary {
-  color: #241733;
-  background: #fff;
-}
-
 .btn-ghost {
   color: var(--muted);
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-body.light-mode .btn-ghost {
-  border-color: rgba(54,38,75,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .pill,
@@ -354,7 +305,7 @@ body.light-mode .btn-ghost {
   padding: 8px 12px;
   border-radius: 999px;
   font-size: 12px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--muted);
 }
 
@@ -378,10 +329,6 @@ body.light-mode .btn-ghost {
   color: #fff;
 }
 
-body.light-mode .field span {
-  color: #241733;
-}
-
 .input,
 .textarea,
 .select {
@@ -392,14 +339,6 @@ body.light-mode .field span {
   color: #fff;
   border: 1px solid #2b1d3d;
   outline: none;
-}
-
-body.light-mode .input,
-body.light-mode .textarea,
-body.light-mode .select {
-  background: #fff;
-  color: #241733;
-  border-color: #d6c6e7;
 }
 
 .textarea {
@@ -448,8 +387,8 @@ body.light-mode .select {
   margin-top: 70px;
   padding: 28px;
   border-radius: 20px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--muted);
 }
 
@@ -466,8 +405,8 @@ body.light-mode .select {
 .kpi {
   border-radius: 20px;
   padding: 22px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .dimension-grid {
@@ -481,12 +420,12 @@ body.light-mode .select {
   font-weight: 700;
   padding: 8px 10px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .progress-track {
   height: 10px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 999px;
   overflow: hidden;
   margin: 12px 0;
@@ -517,19 +456,15 @@ body.light-mode .select {
 .chapter-btn {
   width: 100%;
   text-align: left;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--text);
   border-radius: 14px;
   padding: 12px 14px;
 }
 
-body.light-mode .chapter-btn {
-  color: #241733;
-}
-
 .chapter-btn.active {
-  background: linear-gradient(135deg, rgba(194,24,91,0.16), rgba(156,114,200,0.18));
+  background: linear-gradient(135deg, rgba(194, 24, 91, 0.16), rgba(156, 114, 200, 0.18));
 }
 
 .reader-main h2 {
@@ -550,7 +485,7 @@ body.light-mode .chapter-btn {
   margin-bottom: 12px;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -583,6 +518,28 @@ body.light-mode .chapter-btn {
 }
 
 @media (max-width: 980px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nav {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .nav a {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
   .hero,
   .grid-2,
   .grid-3,
@@ -594,17 +551,28 @@ body.light-mode .chapter-btn {
 
   .hero h1,
   .page-head h1 {
-    font-size: 46px;
-  }
-
-  .nav {
-    display: none;
+    font-size: 42px;
   }
 }
 
 @media (max-width: 640px) {
-  .page-wrap { padding: 16px; }
-  .card, .panel, .glass, .footer { padding: 20px; }
-  .hero h1, .page-head h1 { font-size: 40px; }
-  .section-head h2 { font-size: 34px; }
+  .page-wrap {
+    padding: 16px;
+  }
+
+  .card,
+  .panel,
+  .glass,
+  .footer {
+    padding: 20px;
+  }
+
+  .hero h1,
+  .page-head h1 {
+    font-size: 36px;
+  }
+
+  .section-head h2 {
+    font-size: 34px;
+  }
 }
