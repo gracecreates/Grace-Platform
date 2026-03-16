@@ -3,66 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Tools | G.R.A.C.E.</title>
+  <title>G.R.A.C.E. Tools | G.R.A.C.E.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="statusMessage" class="status-message hidden"></div>
+
   <div class="page-wrap">
     <header class="topbar">
       <div class="brand">
-        <div class="logo-wrap"><img src="logo.PNG" class="logo" alt="G.R.A.C.E. logo" /></div>
-        <div><h2 class="brand-title">G.R.A.C.E.</h2><div class="brand-sub">AI Tools Hub</div></div>
+        <div class="logo-wrap">
+          <img src="logo.PNG" class="logo" alt="G.R.A.C.E. logo" />
+        </div>
+        <div>
+          <h2 class="brand-title">G.R.A.C.E.</h2>
+          <div class="brand-sub">G.R.A.C.E. Tools</div>
+        </div>
       </div>
 
       <nav class="nav">
         <a data-page="home" href="index.html">Home</a>
         <a data-page="dashboard" href="dashboard.html">Dashboard</a>
-        <a data-page="tools" href="tools.html">AI Tools</a>
+        <a data-page="tools" href="tools.html">G.R.A.C.E. Tools</a>
         <a data-page="journal" href="journal.html">Journal</a>
         <a data-page="library" href="library.html">Library</a>
-        <a data-page="games" href="games.html">Growth Lab</a>
+        <a data-page="games" href="games.html">Interactive Tools</a>
         <a data-page="events" href="events.html">Events</a>
         <a data-page="membership" href="membership.html">Membership</a>
       </nav>
-
-      <div class="nav-tools"><button class="btn btn-ghost" id="themeToggle">Light Mode</button></div>
     </header>
 
     <div class="page-head">
-      <h1>AI Tools Hub</h1>
-      <p>From time management to wellness and finances, let AI do the heavy thinking while you live your life.</p>
+      <h1>G.R.A.C.E. Tools</h1>
+      <p>These tools are here to help you check in, think clearly, and focus on what matters most.</p>
     </div>
 
     <section class="section">
       <div class="grid-2">
         <div class="card">
-          <h2 style="margin-top:0;">AI Coach</h2>
-          <p>A direct, warm, strategic guide designed to help users slow things down and find their next step.</p>
+          <h2 style="margin-top:0;">Talk to G.R.A.C.E.</h2>
+          <p>A direct, supportive space to sort through what matters and find your next move.</p>
+
           <div id="coachMessages" style="max-height:360px; overflow:auto; margin:16px 0;"></div>
+
           <label class="field">
             <span>What is going on right now?</span>
-            <textarea id="coachInput" class="textarea" placeholder="I feel stuck, overwhelmed, lost, drained..."></textarea>
+            <textarea
+              id="coachInput"
+              class="textarea"
+              placeholder="I feel stuck, overwhelmed, lost, or drained..."
+            ></textarea>
           </label>
+
           <div class="btn-row">
             <button class="btn btn-primary" id="sendCoachBtn">Send</button>
           </div>
         </div>
 
         <div class="card">
-          <h2 style="margin-top:0;">Core AI systems</h2>
+          <h2 style="margin-top:0;">Featured tools</h2>
+
           <div class="tag-row">
-            <span class="tag">AI Navigation System</span>
-            <span class="tag">Personal Life Strategist</span>
-            <span class="tag">AI Recovery Companion</span>
-            <span class="tag">AI Decision Coach</span>
-            <span class="tag">AI Event Builder</span>
-            <span class="tag">AI Grant Writer</span>
-            <span class="tag">AI Personal Board Game Creator</span>
+            <span class="tag">Life Planning Tool</span>
+            <span class="tag">Support Companion</span>
+            <span class="tag">Decision Guide</span>
+            <span class="tag">Event Builder</span>
+            <span class="tag">Grant Writing Support</span>
+            <span class="tag">Board Game Builder</span>
+            <span class="tag">Reflection Support</span>
           </div>
-          <p class="small" style="margin-top:16px;">These can all be powered later through your Cloudflare Worker and upgraded model routing.</p>
+
+          <p class="small" style="margin-top:16px;">
+            This space can continue growing with more guided tools and support systems.
+          </p>
         </div>
       </div>
     </section>
