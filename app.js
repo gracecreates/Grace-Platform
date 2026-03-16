@@ -355,7 +355,11 @@ async function askGrace(messages) {
     })
   });
 
-  if (!response.ok) throw new Error("Worker request failed");
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || "Worker request failed");
+  }
+
   const data = await response.json();
   return data.reply || "Let’s slow it down and start with one thing that matters most right now.";
 }
@@ -366,30 +370,20 @@ function initAICoach() {
   const messagesWrap = document.getElementById("coachMessages");
   if (!sendBtn || !input || !messagesWrap) return;
 
-  function addBubble(role, text, save = true) {
+  state.coachChat = [];
+  saveState();
+
+  function addBubble(role, text) {
     const div = document.createElement("div");
     div.className = "mini-card";
     div.style.marginBottom = "12px";
     div.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0;">${escapeHtml(text)}</p>`;
     messagesWrap.appendChild(div);
     messagesWrap.scrollTop = messagesWrap.scrollHeight;
-
-    if (save) {
-      state.coachChat.push({ role, content: text });
-      state.coachChat = state.coachChat.slice(-30);
-      saveState();
-    }
   }
 
   messagesWrap.innerHTML = "";
-
-  if (state.coachChat.length) {
-    state.coachChat.forEach((msg) => {
-      addBubble(msg.role, msg.content, false);
-    });
-  } else {
-    addBubble("assistant", "Alright. Talk to me. What is going on right now?", false);
-  }
+  addBubble("assistant", "Alright. Talk to me. What is going on right now?");
 
   if (!sendBtn.dataset.bound) {
     sendBtn.dataset.bound = "true";
@@ -398,6 +392,9 @@ function initAICoach() {
       const text = input.value.trim();
       if (!text) return;
 
+      state.coachChat.push({ role: "user", content: text });
+      saveState();
+
       addBubble("user", text);
       input.value = "";
       sendBtn.disabled = true;
@@ -405,10 +402,12 @@ function initAICoach() {
 
       try {
         const reply = await askGrace(state.coachChat);
+        state.coachChat.push({ role: "assistant", content: reply });
+        saveState();
         addBubble("assistant", reply);
-      } catch {
-        const fallback = "Okay. I hear you. You do not need to figure everything out right now. Let’s slow it down. What feels heaviest at this moment: emotions, money, routines, work, or relationships?";
-        addBubble("assistant", fallback);
+      } catch (error) {
+        console.error(error);
+        addBubble("assistant", "Something went wrong. Try again.");
       } finally {
         sendBtn.disabled = false;
         sendBtn.textContent = "Send";
