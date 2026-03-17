@@ -63,6 +63,7 @@
 
           <div class="btn-row">
             <button class="btn btn-primary" id="sendChatBtn" type="button">Send</button>
+            <button class="btn btn-secondary" id="clearChatBtn" type="button">Clear Chat</button>
           </div>
         </div>
 
@@ -96,37 +97,13 @@
 
   <script src="data.js"></script>
   <script>
-    const WORKER_URL = "https://grace-chat-worker.getrightandconquer.workers.dev";
-
-    const GRACE_SYSTEM = `You are G.R.A.C.E. Get Right And Conquer Everything.
-
-You were built by someone who has lived through real things. Depression, anxiety, loss, financial setbacks, relationship struggles. Not as theory. As lived experience. That is why you exist.
-
-How you show up in every conversation:
-
-When someone is overwhelmed, you slow things down first. You do not jump into advice. You let them talk. You listen. Then you respond.
-You start simple. "Alright. Talk to me. What is going on right now?"
-After they get it out you acknowledge it. "Okay. I hear you." Then you offer something real, not a speech.
-You ground people. "Right now we are just talking. You are not alone in this moment."
-You help people break things into smaller pieces. "We do not have to solve everything tonight. Let us focus on what is happening right now."
-You remind people that what they are feeling is not permanent.
-You ask targeted questions to understand what is really going on.
-You never leave a conversation on a heavy or unresolved note.
-You never give motivational speeches. You give presence, honesty, and help people get through the moment.
-
-Your tone always:
-Direct. Warm but honest. No sugarcoating. No fluff. No fake positivity.
-Short sentences. Real words. Nothing performative.
-You remind people who they are when they forget.
-You keep things grounded and actionable.
-You meet people where they are.
-You always end with one clear next step or something that gives them a little strength to keep going.`;
+    const STORAGE_KEY = "grace-free-chat-v1";
 
     const CHAT_SYSTEM_RESPONSES = [
       {
         match: ["stuck", "direction", "lost", "confused"],
         reply:
-          "Okay. I hear you.\n\nWhen everything feels stuck, the first move is not to solve your whole life tonight. It is to get more honest about what feels most off.\n\nStart with this: what feels heaviest right now — money, emotions, structure, work, or relationships?\n\nNext step: pick one area and answer that in one sentence."
+          "Okay. I hear you.\n\nWhen everything feels stuck, the first move is not to solve your whole life tonight. It is to get clearer on what feels most off.\n\nStart with this: what feels heaviest right now — money, emotions, structure, work, or relationships?\n\nNext step: pick one area and answer that in one sentence."
       },
       {
         match: ["overwhelmed", "burnout", "stress", "too much"],
@@ -139,14 +116,29 @@ You always end with one clear next step or something that gives them a little st
           "Alright. Let us slow it down.\n\nMost hard decisions feel impossible when everything is mixed together. Usually there is the practical side, the emotional side, and the fear side.\n\nWhat decision are you trying to make, and what are the top 2 options?\n\nNext step: tell me the options first, not the whole story."
       },
       {
-        match: ["money", "rent", "debt", "financial"],
+        match: ["money", "rent", "debt", "financial", "bills"],
         reply:
           "Okay. Money stress can make everything feel louder.\n\nDo not judge the situation right now. Just get clear on it. What matters most first is what is urgent, what is due, and what can wait.\n\nNext step: list your top 3 money pressures in order."
       },
       {
-        match: ["anxiety", "depressed", "sad", "mental", "emotion"],
+        match: ["anxiety", "anxious", "depressed", "sad", "mental", "emotion", "crying"],
         reply:
           "Okay. I hear you.\n\nYou do not need to act like you are fine right now. Let us keep it simple.\n\nWhat feels strongest today — anxiety, sadness, numbness, anger, or exhaustion?\n\nNext step: name which one is leading today."
+      },
+      {
+        match: ["relationship", "partner", "family", "friend", "lonely", "people"],
+        reply:
+          "Okay. Relationships can throw everything off when they feel heavy.\n\nRight now, do not try to fix the whole relationship at once. Get clearer on what is hurting most.\n\nNext step: say in one sentence what feels hardest in that relationship right now."
+      },
+      {
+        match: ["work", "job", "career", "purpose"],
+        reply:
+          "Okay. Let us slow that down.\n\nSometimes the job problem is really a money problem, a burnout problem, or a direction problem.\n\nNext step: tell me which feels truest right now — you need stability, you need rest, or you need a new direction."
+      },
+      {
+        match: ["tired", "exhausted", "drained", "burned out"],
+        reply:
+          "Okay. I hear you.\n\nWhen you are drained, the goal is not to force a perfect plan. The goal is to reduce pressure and get clearer.\n\nNext step: what is draining you most right now — people, work, money, your thoughts, or lack of rest?"
       }
     ];
 
@@ -178,14 +170,27 @@ You always end with one clear next step or something that gives them a little st
           <div class="tag-row">
             ${section.items.map((item) => `<span class="tag">${escapeHtml(item)}</span>`).join("")}
           </div>
-          <p class="small" style="margin-top:14px;">Built for future support tools, guided reflection, planning help, and growth inside G.R.A.C.E.</p>
+          <p class="small" style="margin-top:14px;">Built for support, guided reflection, planning help, and growth inside G.R.A.C.E.</p>
         </div>
       `).join("");
     }
 
-    const chatHistory = [];
+    function loadChatHistory() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
 
-    function addChatMessage(role, text) {
+    function saveChatHistory(history) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    let chatHistory = loadChatHistory();
+
+    function addChatMessage(role, text, save = true) {
       const wrap = document.getElementById("chatMessages");
       const bubble = document.createElement("div");
       bubble.className = "mini-card";
@@ -193,6 +198,24 @@ You always end with one clear next step or something that gives them a little st
       bubble.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0; white-space:pre-wrap;">${escapeHtml(text)}</p>`;
       wrap.appendChild(bubble);
       wrap.scrollTop = wrap.scrollHeight;
+
+      if (save) {
+        chatHistory.push({ role, text });
+        chatHistory = chatHistory.slice(-30);
+        saveChatHistory(chatHistory);
+      }
+    }
+
+    function restoreChatHistory() {
+      const wrap = document.getElementById("chatMessages");
+      wrap.innerHTML = "";
+
+      if (!chatHistory.length) {
+        addChatMessage("assistant", "Alright. Talk to me. What is going on right now?", false);
+        return;
+      }
+
+      chatHistory.forEach((msg) => addChatMessage(msg.role, msg.text, false));
     }
 
     function generateGraceReply(text) {
@@ -207,70 +230,30 @@ You always end with one clear next step or something that gives them a little st
       return "Okay. I hear you.\n\nYou do not need to solve everything right now. Let us slow it down and get clearer.\n\nWhat feels most pressing at this moment — your emotions, your money, your routines, your work, or your relationships?\n\nNext step: answer with just one of those.";
     }
 
-    function buildWorkerMessages() {
-      return chatHistory.map((msg) => ({
-        role: msg.role,
-        content: msg.text
-      }));
-    }
-
-    async function askGraceViaWorker() {
-      const response = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          system: GRACE_SYSTEM,
-          messages: buildWorkerMessages()
-        })
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Worker error ${response.status}: ${text}`);
-      }
-
-      const data = await response.json();
-
-      if (!data || !data.reply) {
-        throw new Error("Worker returned no reply");
-      }
-
-      return data.reply;
-    }
-
-    async function sendGraceMessage() {
+    function sendGraceMessage() {
       const input = document.getElementById("chatInput");
-      const btn = document.getElementById("sendChatBtn");
       const text = input.value.trim();
       if (!text) return;
 
-      chatHistory.push({ role: "user", text });
       addChatMessage("user", text);
       input.value = "";
-      btn.disabled = true;
-      btn.textContent = "Sending...";
 
-      try {
-        const reply = await askGraceViaWorker();
-        chatHistory.push({ role: "assistant", text: reply });
-        addChatMessage("assistant", reply);
-      } catch (error) {
-        console.error("Worker failed, using fallback reply:", error);
-        const fallbackReply = generateGraceReply(text);
-        chatHistory.push({ role: "assistant", text: fallbackReply });
-        addChatMessage("assistant", fallbackReply);
-        showStatus("Cloud chat is not connected yet. Using local backup reply.");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Send";
-      }
+      const reply = generateGraceReply(text);
+      addChatMessage("assistant", reply);
+    }
+
+    function clearChat() {
+      chatHistory = [];
+      saveChatHistory(chatHistory);
+      const wrap = document.getElementById("chatMessages");
+      wrap.innerHTML = "";
+      addChatMessage("assistant", "Alright. Talk to me. What is going on right now?", false);
+      showStatus("Chat cleared.");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       renderTools();
-      addChatMessage("assistant", "Alright. Talk to me. What is going on right now?");
+      restoreChatHistory();
 
       document.querySelectorAll(".nav a").forEach((link) => {
         if (link.dataset.page === "tools") {
@@ -279,9 +262,11 @@ You always end with one clear next step or something that gives them a little st
       });
 
       const sendBtn = document.getElementById("sendChatBtn");
+      const clearBtn = document.getElementById("clearChatBtn");
       const chatInput = document.getElementById("chatInput");
 
       sendBtn.addEventListener("click", sendGraceMessage);
+      clearBtn.addEventListener("click", clearChat);
 
       chatInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
