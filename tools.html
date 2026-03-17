@@ -230,9 +230,9 @@
       return "Okay. I hear you.\n\nYou do not need to solve everything right now. Let us slow it down and get clearer.\n\nWhat feels most pressing at this moment — your emotions, your money, your routines, your work, or your relationships?\n\nNext step: answer with just one of those.";
     }
 
-    function sendGraceMessage() {
+    function sendGraceMessage(prefillText = null) {
       const input = document.getElementById("chatInput");
-      const text = input.value.trim();
+      const text = (prefillText ?? input.value).trim();
       if (!text) return;
 
       addChatMessage("user", text);
@@ -251,6 +251,17 @@
       showStatus("Chat cleared.");
     }
 
+    function maybeStartFromHomepageChoice() {
+      const params = new URLSearchParams(window.location.search);
+      const start = params.get("start");
+
+      if (!start) return;
+
+      setTimeout(() => {
+        sendGraceMessage(start);
+      }, 150);
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       renderTools();
       restoreChatHistory();
@@ -265,7 +276,7 @@
       const clearBtn = document.getElementById("clearChatBtn");
       const chatInput = document.getElementById("chatInput");
 
-      sendBtn.addEventListener("click", sendGraceMessage);
+      sendBtn.addEventListener("click", () => sendGraceMessage());
       clearBtn.addEventListener("click", clearChat);
 
       chatInput.addEventListener("keydown", (event) => {
@@ -274,6 +285,8 @@
           sendGraceMessage();
         }
       });
+
+      maybeStartFromHomepageChoice();
     });
   </script>
 </body>
