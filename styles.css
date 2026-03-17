@@ -181,6 +181,12 @@ select:focus-visible {
   letter-spacing: -0.02em;
 }
 
+.hero-title-sm {
+  font-size: clamp(2rem, 4vw, 3rem) !important;
+  line-height: 1.1 !important;
+  max-width: 12ch;
+}
+
 .hero p,
 .page-head p,
 .section-head p,
@@ -257,6 +263,43 @@ select:focus-visible {
 .game-card h3 {
   margin: 0 0 10px;
   font-size: 21px;
+}
+
+.feature-link-card {
+  display: block;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 22px;
+  height: 100%;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.feature-link-card h3 {
+  margin: 0 0 10px;
+  font-size: 21px;
+}
+
+.feature-link-card p {
+  color: var(--muted);
+  line-height: 1.75;
+  margin: 0;
+}
+
+.feature-link-card:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, rgba(35, 24, 49, 0.95), rgba(18, 13, 24, 0.98));
+  border-color: rgba(179, 157, 219, 0.35);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.feature-link-card:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 .btn-row,
@@ -509,6 +552,18 @@ select:focus-visible {
   display: none !important;
 }
 
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mt-22 {
+  margin-top: 22px !important;
+}
+
+.mb-14 {
+  margin-bottom: 14px !important;
+}
+
 @media (max-width: 1150px) {
   .dimension-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -553,6 +608,10 @@ select:focus-visible {
   .page-head h1 {
     font-size: 42px;
   }
+
+  .hero-title-sm {
+    max-width: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -574,5 +633,9 @@ select:focus-visible {
 
   .section-head h2 {
     font-size: 34px;
+  }
+
+  .hero-title-sm {
+    font-size: 2rem !important;
   }
 }
