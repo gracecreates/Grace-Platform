@@ -1,57 +1,5 @@
 const STORAGE_KEY = "grace-os-v1";
-const WORKER_URL = "https://grace-chat-worker.getrightandconquer.workers.dev";
-
-const GRACE_SYSTEM = `You are G.R.A.C.E. Get Right And Conquer Everything.
-
-You were built by someone who has lived through real things. Depression, anxiety, loss, financial setbacks, relationship struggles. Not as theory. As lived experience. That is why you exist.
-
-How you show up in every conversation:
-
-When someone is overwhelmed, you slow things down first. You do not jump into advice. You let them talk. You listen. Then you respond.
-You start simple. "Alright. Talk to me. What is going on right now?"
-After they get it out you acknowledge it. "Okay. I hear you." Then you offer something real, not a speech.
-You ground people. "Right now we are just talking. You are not alone in this moment."
-You help them break things into smaller pieces. "We do not have to solve everything tonight. Let us focus on what is happening right now."
-You remind people that what they are feeling is not permanent.
-You ask targeted questions to understand what is really going on.
-You never leave a conversation on a heavy or unresolved note.
-You never give motivational speeches. You give presence, honesty, and help people get through the moment.
-
-Your tone always:
-Direct. Warm but honest. No sugarcoating. No fluff. No fake positivity.
-Short sentences. Real words. Nothing performative.
-You remind people who they are when they forget.
-You keep things grounded and actionable.
-You meet people where they are.
-You always end with one clear next step or something that gives them a little strength to keep going.`;
-
-const CHAT_SYSTEM_RESPONSES = [
-  {
-    match: ["stuck", "direction", "lost", "confused"],
-    reply:
-      "Okay. I hear you.\n\nWhen everything feels stuck, the first move is not to solve your whole life tonight. It is to get more honest about what feels most off.\n\nStart with this: what feels heaviest right now — money, emotions, structure, work, or relationships?\n\nNext step: pick one area and answer that in one sentence."
-  },
-  {
-    match: ["overwhelmed", "burnout", "stress", "too much"],
-    reply:
-      "Okay. I hear you.\n\nWhen you are overwhelmed, the goal is not to push harder. It is to slow things down enough to see what is actually going on.\n\nRight now, name the 3 things taking up the most energy.\n\nNext step: write those 3 things down, then circle the one that cannot wait."
-  },
-  {
-    match: ["decision", "decide", "choice"],
-    reply:
-      "Alright. Let us slow it down.\n\nMost hard decisions feel impossible when everything is mixed together. Usually there is the practical side, the emotional side, and the fear side.\n\nWhat decision are you trying to make, and what are the top 2 options?\n\nNext step: tell me the options first, not the whole story."
-  },
-  {
-    match: ["money", "rent", "debt", "financial"],
-    reply:
-      "Okay. Money stress can make everything feel louder.\n\nDo not judge the situation right now. Just get clear on it. What matters most first is what is urgent, what is due, and what can wait.\n\nNext step: list your top 3 money pressures in order."
-  },
-  {
-    match: ["anxiety", "depressed", "sad", "mental", "emotion"],
-    reply:
-      "Okay. I hear you.\n\nYou do not need to act like you are fine right now. Let us keep it simple.\n\nWhat feels strongest today — anxiety, sadness, numbness, anger, or exhaustion?\n\nNext step: name which one is leading today."
-  }
-];
+const FREE_CHAT_STORAGE_KEY = "grace-free-chat-v1";
 
 function defaultState() {
   return {
@@ -72,8 +20,7 @@ function defaultState() {
     },
     journal: [],
     guideNotes: [],
-    history: [],
-    chatHistory: []
+    history: []
   };
 }
 
@@ -89,8 +36,7 @@ function loadState() {
       scores: { ...defaultState().scores, ...(parsed.scores || {}) },
       journal: Array.isArray(parsed.journal) ? parsed.journal : [],
       guideNotes: Array.isArray(parsed.guideNotes) ? parsed.guideNotes : [],
-      history: Array.isArray(parsed.history) ? parsed.history : [],
-      chatHistory: Array.isArray(parsed.chatHistory) ? parsed.chatHistory : []
+      history: Array.isArray(parsed.history) ? parsed.history : []
     };
   } catch {
     return defaultState();
@@ -227,7 +173,7 @@ function renderTools() {
       <div class="tag-row">
         ${section.items.map((item) => `<span class="tag">${escapeHtml(item)}</span>`).join("")}
       </div>
-      <p class="small" style="margin-top:14px;">Built for future support tools, guided reflection, planning help, and growth inside G.R.A.C.E.</p>
+      <p class="small" style="margin-top:14px;">Built for support, guided reflection, planning help, and growth inside G.R.A.C.E.</p>
     </div>
   `).join("");
 }
@@ -397,6 +343,96 @@ function renderJournal() {
   }
 }
 
+const CHAT_SYSTEM_RESPONSES = [
+  {
+    match: ["stuck", "direction", "lost", "confused"],
+    reply:
+      "Okay. I hear you.\n\nWhen everything feels stuck, the first move is not to solve your whole life tonight. It is to get clearer on what feels most off.\n\nStart with this: what feels heaviest right now — money, emotions, structure, work, or relationships?\n\nNext step: pick one area and answer that in one sentence."
+  },
+  {
+    match: ["overwhelmed", "burnout", "stress", "too much"],
+    reply:
+      "Okay. I hear you.\n\nWhen you are overwhelmed, the goal is not to push harder. It is to slow things down enough to see what is actually going on.\n\nRight now, name the 3 things taking up the most energy.\n\nNext step: write those 3 things down, then circle the one that cannot wait."
+  },
+  {
+    match: ["decision", "decide", "choice"],
+    reply:
+      "Alright. Let us slow it down.\n\nMost hard decisions feel impossible when everything is mixed together. Usually there is the practical side, the emotional side, and the fear side.\n\nWhat decision are you trying to make, and what are the top 2 options?\n\nNext step: tell me the options first, not the whole story."
+  },
+  {
+    match: ["money", "rent", "debt", "financial", "bills"],
+    reply:
+      "Okay. Money stress can make everything feel louder.\n\nDo not judge the situation right now. Just get clear on it. What matters most first is what is urgent, what is due, and what can wait.\n\nNext step: list your top 3 money pressures in order."
+  },
+  {
+    match: ["anxiety", "anxious", "depressed", "sad", "mental", "emotion", "crying"],
+    reply:
+      "Okay. I hear you.\n\nYou do not need to act like you are fine right now. Let us keep it simple.\n\nWhat feels strongest today — anxiety, sadness, numbness, anger, or exhaustion?\n\nNext step: name which one is leading today."
+  },
+  {
+    match: ["relationship", "partner", "family", "friend", "lonely", "people"],
+    reply:
+      "Okay. Relationships can throw everything off when they feel heavy.\n\nRight now, do not try to fix the whole relationship at once. Get clearer on what is hurting most.\n\nNext step: say in one sentence what feels hardest in that relationship right now."
+  },
+  {
+    match: ["work", "job", "career", "purpose"],
+    reply:
+      "Okay. Let us slow that down.\n\nSometimes the job problem is really a money problem, a burnout problem, or a direction problem.\n\nNext step: tell me which feels truest right now — you need stability, you need rest, or you need a new direction."
+  },
+  {
+    match: ["tired", "exhausted", "drained", "burned out"],
+    reply:
+      "Okay. I hear you.\n\nWhen you are drained, the goal is not to force a perfect plan. The goal is to reduce pressure and get clearer.\n\nNext step: what is draining you most right now — people, work, money, your thoughts, or lack of rest?"
+  }
+];
+
+function loadFreeChatHistory() {
+  try {
+    const raw = localStorage.getItem(FREE_CHAT_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveFreeChatHistory(history) {
+  localStorage.setItem(FREE_CHAT_STORAGE_KEY, JSON.stringify(history));
+}
+
+let freeChatHistory = loadFreeChatHistory();
+
+function addFreeChatMessage(role, text, save = true) {
+  const wrap = document.getElementById("chatMessages");
+  if (!wrap) return;
+
+  const bubble = document.createElement("div");
+  bubble.className = "mini-card";
+  bubble.style.marginBottom = "12px";
+  bubble.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0; white-space:pre-wrap;">${escapeHtml(text)}</p>`;
+  wrap.appendChild(bubble);
+  wrap.scrollTop = wrap.scrollHeight;
+
+  if (save) {
+    freeChatHistory.push({ role, text });
+    freeChatHistory = freeChatHistory.slice(-30);
+    saveFreeChatHistory(freeChatHistory);
+  }
+}
+
+function restoreFreeChatHistory() {
+  const wrap = document.getElementById("chatMessages");
+  if (!wrap) return;
+
+  wrap.innerHTML = "";
+
+  if (!freeChatHistory.length) {
+    addFreeChatMessage("assistant", "Alright. Talk to me. What is going on right now?", false);
+    return;
+  }
+
+  freeChatHistory.forEach((msg) => addFreeChatMessage(msg.role, msg.text, false));
+}
+
 function generateGraceReply(text) {
   const lower = text.toLowerCase();
 
@@ -409,119 +445,57 @@ function generateGraceReply(text) {
   return "Okay. I hear you.\n\nYou do not need to solve everything right now. Let us slow it down and get clearer.\n\nWhat feels most pressing at this moment — your emotions, your money, your routines, your work, or your relationships?\n\nNext step: answer with just one of those.";
 }
 
-function addChatMessage(role, text, saveToState = true) {
-  const wrap = document.getElementById("chatMessages");
-  if (!wrap) return;
+function sendFreeGraceMessage() {
+  const input = document.getElementById("chatInput");
+  if (!input) return;
 
-  const bubble = document.createElement("div");
-  bubble.className = "mini-card";
-  bubble.style.marginBottom = "12px";
-  bubble.innerHTML = `<strong>${role === "user" ? "You" : "G.R.A.C.E."}</strong><p style="margin-bottom:0; white-space:pre-wrap;">${escapeHtml(text)}</p>`;
-  wrap.appendChild(bubble);
-  wrap.scrollTop = wrap.scrollHeight;
+  const text = input.value.trim();
+  if (!text) return;
 
-  if (saveToState) {
-    state.chatHistory.push({ role, text });
-    state.chatHistory = state.chatHistory.slice(-20);
-    saveState();
-  }
+  addFreeChatMessage("user", text);
+  input.value = "";
+
+  const reply = generateGraceReply(text);
+  addFreeChatMessage("assistant", reply);
 }
 
-function restoreChatHistory() {
+function clearFreeChat() {
+  freeChatHistory = [];
+  saveFreeChatHistory(freeChatHistory);
   const wrap = document.getElementById("chatMessages");
   if (!wrap) return;
 
   wrap.innerHTML = "";
-
-  if (!state.chatHistory.length) {
-    addChatMessage("assistant", "Alright. Talk to me. What is going on right now?", false);
-    return;
-  }
-
-  state.chatHistory.forEach((msg) => {
-    addChatMessage(msg.role, msg.text, false);
-  });
+  addFreeChatMessage("assistant", "Alright. Talk to me. What is going on right now?", false);
+  showStatus("Chat cleared.");
 }
 
-function buildWorkerMessages() {
-  return state.chatHistory
-    .filter((msg) => msg.role === "user" || msg.role === "assistant")
-    .map((msg) => ({
-      role: msg.role,
-      content: msg.text
-    }));
-}
-
-async function askGraceViaWorker() {
-  const response = await fetch(WORKER_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      system: GRACE_SYSTEM,
-      messages: buildWorkerMessages()
-    })
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Worker error ${response.status}: ${text}`);
-  }
-
-  const data = await response.json();
-
-  if (!data || !data.reply) {
-    throw new Error("Worker returned no reply");
-  }
-
-  return data.reply;
-}
-
-async function sendGraceMessage(prefillText = null) {
-  const input = document.getElementById("chatInput");
-  const btn = document.getElementById("sendChatBtn");
-  const text = (prefillText ?? input.value).trim();
-  if (!text || !btn) return;
-
-  addChatMessage("user", text);
-  if (input) input.value = "";
-  btn.disabled = true;
-  btn.textContent = "Sending...";
-
-  try {
-    const reply = await askGraceViaWorker();
-    addChatMessage("assistant", reply);
-  } catch (error) {
-    console.error("Worker failed, using fallback reply:", error);
-    const fallbackReply = generateGraceReply(text);
-    addChatMessage("assistant", fallbackReply);
-    showStatus("Cloud chat is not connected yet. Using local backup reply.");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Send";
-  }
-}
-
-function initToolsChat() {
+function initFreeToolsChat() {
   const sendBtn = document.getElementById("sendChatBtn");
-  const input = document.getElementById("chatInput");
-  const messagesWrap = document.getElementById("chatMessages");
-  if (!sendBtn || !input || !messagesWrap) return;
+  const clearBtn = document.getElementById("clearChatBtn");
+  const chatInput = document.getElementById("chatInput");
+  const chatMessages = document.getElementById("chatMessages");
 
-  restoreChatHistory();
+  if (!sendBtn || !clearBtn || !chatInput || !chatMessages) return;
+
+  restoreFreeChatHistory();
 
   if (!sendBtn.dataset.bound) {
     sendBtn.dataset.bound = "true";
-    sendBtn.addEventListener("click", () => sendGraceMessage());
+    sendBtn.addEventListener("click", sendFreeGraceMessage);
   }
 
-  if (!input.dataset.bound) {
-    input.dataset.bound = "true";
-    input.addEventListener("keydown", (event) => {
+  if (!clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = "true";
+    clearBtn.addEventListener("click", clearFreeChat);
+  }
+
+  if (!chatInput.dataset.bound) {
+    chatInput.dataset.bound = "true";
+    chatInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        sendGraceMessage();
+        sendFreeGraceMessage();
       }
     });
   }
@@ -553,5 +527,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("libraryGrid")) renderLibrary();
   if (document.getElementById("chapterList")) renderGuideReader();
   if (document.getElementById("journalEntries")) renderJournal();
-  if (document.getElementById("chatMessages")) initToolsChat();
+  if (document.getElementById("chatMessages")) initFreeToolsChat();
 });
